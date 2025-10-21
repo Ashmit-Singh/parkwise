@@ -1,5 +1,5 @@
 package com.parkwise.entity;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,6 +30,7 @@ public class Campaign {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "park_id")
+    @JsonIgnore
     private Park park;
     
     private LocalDateTime createdAt;
