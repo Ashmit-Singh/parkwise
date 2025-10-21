@@ -36,4 +36,6 @@ public interface BlockchainTransactionRepository extends JpaRepository<Blockchai
         BlockchainTransaction.TransactionStatus status, 
         BlockchainTransaction.TransactionType type
     );
+    
+    List<BlockchainTransaction> findByUserId(Long userId);
 }

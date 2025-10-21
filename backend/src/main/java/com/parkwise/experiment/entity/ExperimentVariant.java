@@ -32,6 +32,12 @@ public class ExperimentVariant {
     @Column(name = "allocation_percentage", nullable = false)
     private BigDecimal allocationPercentage;
 
+    @Column(name = "impression_count", nullable = false)
+    private Integer impressionCount = 0;
+
+    @Column(name = "conversion_count", nullable = false)
+    private Integer conversionCount = 0;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
