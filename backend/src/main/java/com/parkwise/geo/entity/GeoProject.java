@@ -2,8 +2,12 @@ package com.parkwise.geo.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -12,6 +16,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class GeoProject {
     
     @Id
@@ -20,6 +25,9 @@ public class GeoProject {
     
     @Column(nullable = false)
     private String projectName;
+    
+    @Column(nullable = false)
+    private String name; // Added for GeospatialService compatibility
     
     @Column(length = 2000)
     private String description;
@@ -64,6 +72,16 @@ public class GeoProject {
     
     @Column(length = 4000)
     private String geofenceBoundary; // GeoJSON polygon
+    
+    // PostGIS geometry fields
+    @Column(columnDefinition = "geometry(Point,4326)")
+    private Point location; // JTS Point for PostGIS
+    
+    @Column(columnDefinition = "geometry(Polygon,4326)")
+    private Polygon geofence; // JTS Polygon for PostGIS
+    
+    @Column(length = 100)
+    private String category; // FOREST, OCEAN, WETLAND, etc.
     
     @Column(length = 500)
     private String locationProofHash; // IPFS hash of location proof
