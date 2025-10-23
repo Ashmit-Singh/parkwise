@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Upload, AlertCircle, CheckCircle, Loader } from 'lucide-react'
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:8081/api'
+const API_BASE_URL = 'http://localhost:8080/api'
 
 /**
  * Image Upload Component for Species Identification

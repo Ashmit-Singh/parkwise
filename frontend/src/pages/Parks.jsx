@@ -9,7 +9,7 @@ const Parks = () => {
   useEffect(() => {
     const fetchParks = async () => {
       try {
-        const response = await axios.get('/api/parks')
+        const response = await axios.get('/parks')
         setParks(response.data)
       } catch (error) {
         console.error('Error fetching parks:', error)

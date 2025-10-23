@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { MapPin, Loader, AlertCircle } from 'lucide-react'
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:8081/api'
+const API_BASE_URL = 'http://localhost:8080/api'
 
 /**
  * Sightings Map Component - Display species sightings on interactive map

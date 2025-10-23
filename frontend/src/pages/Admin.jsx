@@ -16,7 +16,7 @@ const Admin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post('/api/parks', park)
+      const response = await axios.post('/parks', park)
       alert('Park added successfully!')
       setPark({
         name: '',

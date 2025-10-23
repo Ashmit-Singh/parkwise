@@ -192,27 +192,27 @@ boolean existsByWalletAddress(String walletAddress);
 ### Flow 2: Web3 Wallet Authentication
 ```
 1. Frontend: Generate message for signature
-   → Example: "Sign in to ParkWise: {nonce}"
+  **Example:** "Sign in to ParkWise: {nonce}"
 
-2. Frontend: Request MetaMask signature
-   → User signs message with private key
+2. **Frontend:** Request MetaMask signature
+   - User signs message with private key
 
-3. POST /api/auth/web3/login
-   → Signature verification (ECRECOVER)
-   → Auto-create user if not exists
-   → JWT tokens issued
+3. **POST** `/api/auth/web3/login`
+   - Signature verification (ECRECOVER)
+   - Auto-create user if not exists
+   - JWT tokens issued
 
-4. Future requests: Use JWT like traditional auth
+4. **Future requests:** Use JWT like traditional auth
 ```
 
 ### Flow 3: Token Refresh
 ```
 1. Access token expires after 24h
 2. POST /api/auth/refresh
-   → Send refresh token in Authorization header
-   → Validate refresh token (7d expiration)
-   → Issue new access token
-   → Issue new refresh token
+   - Send refresh token in Authorization header
+   - Validate refresh token (7d expiration)
+   - Issue new access token
+   - Issue new refresh token
 ```
 
 ---
@@ -225,7 +225,7 @@ boolean existsByWalletAddress(String walletAddress);
 - **Validation:** Minimum 8 characters required
 
 ### 2. JWT Security
-- **Signing:** HMAC-SHA256 symmetric encryption
+- **Algorithm:** HMAC-SHA256
 - **Secret:** Configured via `${jwt.secret}` property
 - **Expiration:**
   - Access tokens: 24 hours
@@ -234,9 +234,9 @@ boolean existsByWalletAddress(String walletAddress);
 
 ### 3. Web3 Security
 - **Algorithm:** Ethereum ECRECOVER signature recovery
-- **Message Format:** EIP-191 standard
-- **Verification:** Public key recovered from signature matches wallet address
-- **Protection:** Prevents signature replay attacks (nonce in message)
+- **Standard:** EIP-191 message format
+- **Verification:** Public key recovery matches wallet address
+- **Protection:** Nonce prevents replay attacks
 
 ### 4. CORS Protection
 - **Allowed Origins:**
@@ -247,69 +247,75 @@ boolean existsByWalletAddress(String walletAddress);
 - **Credentials:** Enabled for cookies/auth headers
 
 ### 5. CSRF Protection
-- **Status:** Disabled (stateless JWT auth)
-- **Justification:** No session cookies = no CSRF risk
+- **Status:** Disabled for stateless JWT authentication
+- **Rationale:** No session cookies eliminates CSRF attack vectors
 
 ---
 
 ## 🎭 Role-Based Access Control (RBAC)
 
 ### Public Endpoints (No Authentication)
-- `/api/auth/**` - Registration, login
+- `/api/auth/**` - Registration and login
 - `/api/public/**` - Public project data
-- `/api/projects/**` - Browse conservation projects
+- `/api/projects/**` - Conservation project browsing
 - `/api/species/public/**` - Species identification results
-- `/api/experiments/assign` - A/B test variant assignment
-- `/api/experiments/log-event` - Behavioral event logging
+- `/api/experiments/assign` - A/B test assignments
+- `/api/experiments/log-event` - Event logging
 - `/swagger-ui/**` - API documentation
-- `/actuator/health` - Health checks
+- `/actuator/health` - Health monitoring
 - `/ws/**` - WebSocket connections
 
 ### DONOR Role (Authenticated)
-- **POST** `/api/blockchain/donate` - Make blockchain donations
+- **POST** `/api/blockchain/donate` - Blockchain donations
 - All public endpoints
 
 ### RESEARCHER Role
-- **All DONOR permissions +**
-- `/api/admin/**` - Admin dashboard
-- **POST** `/api/experiments/create` - Create A/B tests
-- **GET** `/api/experiments/*/metrics` - View experiment results
+- **All DONOR permissions plus:**
+- `/api/admin/**` - Admin dashboard access
+- **POST** `/api/experiments/create` - A/B test creation
+- **GET** `/api/experiments/*/metrics` - Experiment analytics
 
 ### NGO Role
-- **All DONOR permissions +**
-- **POST** `/api/geo/projects/create` - Create geofenced projects
-- **POST** `/api/blockchain/release-funds` - Release escrow funds
+- **All DONOR permissions plus:**
+- **POST** `/api/geo/projects/create` - Geofenced project creation
+- **POST** `/api/blockchain/release-funds` - Escrow fund release
 
 ### ADMIN Role
-- **All permissions** (full access)
+- **Full system access** (all permissions)
 
 ---
 
 ## 🔧 Configuration Required
 
 ### 1. Application Properties
-Add to `backend/src/main/resources/application.properties`:
+**File:** `backend/src/main/resources/application.properties`
 
 ```properties
 # JWT Configuration
-jwt.secret=your-256-bit-secret-key-here-change-in-production
+jwt.secret=${JWT_SECRET:your-256-bit-secret-key-change-in-production}
 jwt.expiration=86400000
 jwt.refresh-expiration=604800000
 
-# Database
-spring.datasource.url=jdbc:postgresql://localhost:5432/parkwise
-spring.datasource.username=postgres
-spring.datasource.password=your_password
+# Database Configuration
+spring.datasource.url=${DATABASE_URL:jdbc:postgresql://localhost:5432/parkwise}
+spring.datasource.username=${DB_USERNAME:postgres}
+spring.datasource.password=${DB_PASSWORD:your_password}
 
-# Hibernate
+# JPA/Hibernate
 spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=true
 ```
 
-### 2. Environment Variables (Production)
+### 2. Environment Variables
 ```bash
+# Security
 export JWT_SECRET=$(openssl rand -base64 32)
+
+# Database
 export DATABASE_URL=postgresql://user:pass@host:5432/parkwise
+export DB_USERNAME=postgres
+export DB_PASSWORD=secure_password
 ```
 
 ---
@@ -318,7 +324,7 @@ export DATABASE_URL=postgresql://user:pass@host:5432/parkwise
 
 ### 1. Register New User
 ```bash
-curl -X POST http://localhost:8080/api/auth/register \
+curl -X POST http://localhost:8081/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "donor@example.com",
@@ -348,7 +354,7 @@ curl -X POST http://localhost:8080/api/auth/register \
 
 ### 2. Login
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST http://localhost:8081/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "donor@example.com",
@@ -360,11 +366,11 @@ curl -X POST http://localhost:8080/api/auth/login \
 
 ### 3. Web3 Login (Wallet)
 ```bash
-# Frontend generates signature with MetaMask:
-# const message = `Sign in to ParkWise: ${nonce}`;
-# const signature = await signer.signMessage(message);
+# Frontend signature generation:
+# const message = `Sign in to ParkWise: ${nonce}`
+# const signature = await signer.signMessage(message)
 
-curl -X POST http://localhost:8080/api/auth/web3/login \
+curl -X POST http://localhost:8081/api/auth/web3/login \
   -H "Content-Type: application/json" \
   -d '{
     "walletAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
@@ -377,7 +383,7 @@ curl -X POST http://localhost:8080/api/auth/web3/login \
 
 ### 4. Access Protected Endpoint
 ```bash
-curl -X GET http://localhost:8080/api/user/profile \
+curl -X GET http://localhost:8081/api/user/profile \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -385,7 +391,7 @@ curl -X GET http://localhost:8080/api/user/profile \
 
 ### 5. Refresh Token
 ```bash
-curl -X POST http://localhost:8080/api/auth/refresh \
+curl -X POST http://localhost:8081/api/auth/refresh \
   -H "Authorization: Bearer {refreshToken}"
 ```
 
@@ -411,14 +417,15 @@ curl -X POST http://localhost:8080/api/auth/refresh \
 
 ## 📈 Database Schema Updates
 
-### New Columns in `users` Table
+### Users Table Schema
 ```sql
-ALTER TABLE users ADD COLUMN password VARCHAR(255);
-ALTER TABLE users ADD COLUMN wallet_address VARCHAR(42) UNIQUE;
-ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'DONOR';
-ALTER TABLE users ADD COLUMN enabled BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE users 
+  ADD COLUMN password VARCHAR(255),
+  ADD COLUMN wallet_address VARCHAR(42) UNIQUE,
+  ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'DONOR',
+  ADD COLUMN enabled BOOLEAN NOT NULL DEFAULT true;
 
--- Indexes for performance
+-- Performance indexes
 CREATE INDEX idx_users_wallet ON users(wallet_address);
 CREATE INDEX idx_users_role ON users(role);
 ```
@@ -427,92 +434,91 @@ CREATE INDEX idx_users_role ON users(role);
 
 ## 🚀 Next Steps
 
-### 1. Immediate (Required for Testing)
-- [ ] Add `jwt.secret` to application.properties
-- [ ] Configure PostgreSQL database connection
-- [ ] Run database migrations
-- [ ] Start Spring Boot application
-- [ ] Test registration endpoint
+### 1. Immediate Setup
+- [ ] Configure JWT secret in environment variables
+- [ ] Set up PostgreSQL database connection
+- [ ] Execute database migrations
+- [ ] Start Spring Boot application (port 8081)
+- [ ] Verify registration endpoint
 
-### 2. Frontend Integration (Week 1)
-- [ ] Install `ethers.js` or `wagmi` for Web3
-- [ ] Create login/register forms
-- [ ] Implement MetaMask connection
-- [ ] Add JWT token storage (localStorage/sessionStorage)
-- [ ] Create axios interceptor for Authorization headers
+### 2. Frontend Integration
+- [ ] Install Web3 libraries (`ethers.js` or `wagmi`)
+- [ ] Build authentication UI components
+- [ ] Integrate MetaMask wallet connection
+- [ ] Implement secure token storage
+- [ ] Configure HTTP client with auth interceptors
 
-### 3. Advanced Features (Week 2-3)
-- [ ] Email verification (OTP/magic links)
-- [ ] Password reset functionality
+### 3. Enhanced Security
+- [ ] Email verification system
+- [ ] Password reset workflow
 - [ ] Two-factor authentication (2FA)
-- [ ] Session management dashboard
-- [ ] Audit logging for security events
+- [ ] Session management interface
+- [ ] Security audit logging
 
-### 4. Blockchain Integration (Week 3-4)
+### 4. Blockchain Integration
 - [ ] Enhance BlockchainService with Web3j
-- [ ] Create smart contract event listeners
-- [ ] Implement donation transaction monitoring
-- [ ] Build escrow fund release mechanism
+- [ ] Implement smart contract event listeners
+- [ ] Add donation transaction monitoring
+- [ ] Build escrow fund release system
 
 ---
 
 ## 🎯 Architecture Alignment
 
-### From BACKEND_ARCHITECTURE.md
-✅ **Security & Identity Layer**
-- ✅ JWT + Web3 wallet login (MetaMask)
-- ✅ Role management: DONOR, RESEARCHER, ADMIN, NGO
-- ✅ Spring Security configuration
-- ✅ BCrypt password hashing
-- ✅ Ethereum signature verification
+### Backend Implementation ✅
+- JWT + Web3 wallet authentication
+- Role-based access control (DONOR, RESEARCHER, ADMIN, NGO)
+- Spring Security configuration
+- BCrypt password hashing
+- Ethereum signature verification
 
-### From FRONTEND_ARCHITECTURE.md (Pending)
-- ⏳ React 18.3 + TypeScript
-- ⏳ wagmi/ethers.js integration
-- ⏳ Zustand state management
-- ⏳ shadcn/ui components
-- ⏳ Authentication UI flows
+### Frontend Integration (Pending)
+- React 18.3 + TypeScript
+- Web3 library integration
+- State management setup
+- UI component library
+- Authentication flow implementation
 
 ---
 
 ## 📖 Developer Notes
 
-### Why Dual Authentication?
-- **Traditional Auth:** Required for researchers/admins without Web3 wallets
-- **Web3 Auth:** Enables decentralized donations with transparent blockchain tracking
-- **Flexibility:** Users can link wallets to existing accounts later
+### Dual Authentication Strategy
+- **Traditional:** Email/password for users without Web3 wallets
+- **Web3:** Wallet-based auth for decentralized donations
+- **Flexibility:** Account linking supported
 
-### Security Considerations
-1. **JWT Secret:** MUST be 256+ bits, stored as environment variable
-2. **HTTPS Required:** JWT tokens vulnerable to interception over HTTP
-3. **Refresh Token Rotation:** Consider implementing for enhanced security
-4. **Rate Limiting:** Add to prevent brute-force attacks (use Spring Cloud Gateway or Resilience4j)
+### Security Requirements
+1. **JWT Secret:** Minimum 256-bit, environment variable only
+2. **HTTPS:** Required for production (token security)
+3. **Token Rotation:** Implement for enhanced security
+4. **Rate Limiting:** Prevent brute-force attacks
 
-### Performance Tips
-- JWT validation is stateless (no database lookup per request)
-- Consider Redis for token blacklist (logout before expiration)
-- Use `@Cacheable` for user lookups in UserDetailsService
+### Performance Optimization
+- Stateless JWT validation (no DB queries)
+- Redis token blacklist for logout
+- Cached user lookups with `@Cacheable`
 
 ---
 
 ## 🙏 Credits
 
-**Technologies:**
-- Spring Boot 3.5.0
-- Spring Security 6.5.0
-- jjwt 0.11.5 (JWT library)
-- Web3j 4.10.3 (Ethereum)
-- Lombok (boilerplate reduction)
-- Hibernate 6.6.15.Final
+**Technology Stack:**
+- Spring Boot 3.2.0
+- Spring Security 6.x
+- JJWT 0.12.3
+- Web3j 4.10.3
+- Lombok
+- Hibernate 6.x
 
-**Architecture Inspired By:**
-- OAuth 2.0 / OpenID Connect patterns
-- EIP-191 (Ethereum signed data standard)
-- OWASP Authentication Cheat Sheet
+**Standards:**
+- OAuth 2.0 / OpenID Connect
+- EIP-191 (Ethereum signatures)
+- OWASP Security Guidelines
 
 ---
 
-**Status:** ✅ **Authentication System Complete**  
-**Date:** January 21, 2025  
+## Status: ✅ Complete
+
 **Build:** SUCCESS (86 files, 0 errors)  
-**Ready For:** API testing, frontend integration, database configuration
+**Ready for:** API testing, frontend integration, database setup
