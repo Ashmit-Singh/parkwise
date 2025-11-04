@@ -1,0 +1,139 @@
+# ParkWise AI Species Identification - Training Configuration
+
+# Dataset Configuration
+dataset:
+  name: "indian_wildlife_species"
+  data_dir: "./data/raw"
+  processed_dir: "./data/processed"
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+  min_samples_per_class: 50
+  image_size: [224, 224]
+  num_classes: 5  # Adjust based on your species count
+  
+# Model Configuration
+model:
+  architecture: "efficientnet_b3"  # Options: resnet50, efficientnet_b3, vit_base, mobilenet_v3
+  pretrained: true
+  freeze_backbone: false
+  dropout_rate: 0.3
+  num_classes: 5
+  
+# Training Configuration
+training:
+  batch_size: 16
+  epochs: 20
+  learning_rate: 0.001
+  optimizer: "adam"  # Options: adam, sgd, adamw
+  scheduler: "cosine"  # Options: cosine, step, plateau
+  early_stopping_patience: 15
+  save_best_only: true
+  
+# Data Augmentation
+augmentation:
+  train:
+    random_flip: true
+    random_rotation: 15
+    random_brightness: 0.2
+    random_contrast: 0.2
+    random_saturation: 0.2
+    random_hue: 0.1
+    random_crop: true
+    mixup_alpha: 0.2
+    cutmix_alpha: 1.0
+  val:
+    center_crop: true
+    
+# Loss & Metrics
+loss:
+  type: "focal_loss"  # Options: cross_entropy, focal_loss, label_smoothing
+  focal_alpha: 0.25
+  focal_gamma: 2.0
+  label_smoothing: 0.1
+  
+metrics:
+  - "accuracy"
+  - "top5_accuracy"
+  - "precision"
+  - "recall"
+  - "f1_score"
+  
+# Hardware Configuration
+hardware:
+  device: "cuda"  # Options: cuda, cpu, mps (for Mac)
+  num_workers: 4
+  pin_memory: true
+  mixed_precision: true
+  
+# Checkpointing
+checkpoint:
+  save_dir: "./models/checkpoints"
+  save_frequency: 5
+  keep_last_n: 3
+  
+# Logging
+logging:
+  use_tensorboard: true
+  use_wandb: false
+  log_dir: "./logs"
+  project_name: "parkwise-species-id"
+  
+# Inference Configuration
+inference:
+  confidence_threshold: 0.5
+  top_k_predictions: 5
+  tta: false  # Test Time Augmentation
+  
+# Species Categories (Indian Wildlife Focus)
+species_categories:
+  mammals:
+    - "Bengal Tiger"
+    - "Indian Elephant"
+    - "Indian Rhinoceros"
+    - "Asiatic Lion"
+    - "Snow Leopard"
+    - "Clouded Leopard"
+    - "Indian Leopard"
+    - "Sloth Bear"
+    - "Himalayan Black Bear"
+    - "Wild Water Buffalo"
+    - "Indian Gaur"
+    - "Nilgai"
+    - "Blackbuck"
+    - "Chital (Spotted Deer)"
+    - "Sambar Deer"
+    - "Barasingha"
+    - "Hangul (Kashmir Stag)"
+    - "Indian Wild Ass"
+    - "Nilgiri Tahr"
+    - "Himalayan Tahr"
+  
+  birds:
+    - "Great Hornbill"
+    - "Indian Peafowl"
+    - "Sarus Crane"
+    - "Bengal Florican"
+    - "Great Indian Bustard"
+    - "Himalayan Monal"
+    - "Painted Stork"
+    - "Black-necked Crane"
+    - "White-rumped Vulture"
+    - "Indian Vulture"
+  
+  reptiles:
+    - "King Cobra"
+    - "Indian Python"
+    - "Gharial"
+    - "Saltwater Crocodile"
+    - "Mugger Crocodile"
+    - "Indian Star Tortoise"
+  
+  amphibians:
+    - "Purple Frog"
+    - "Malabar Gliding Frog"
+  
+  others:
+    - "Red Panda"
+    - "Ganges River Dolphin"
+    - "Dugong"

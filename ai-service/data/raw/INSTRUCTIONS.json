@@ -1,0 +1,33 @@
+{
+  "instructions": "Add wildlife species images to the data/raw directory",
+  "structure": "data/raw/{species_name}/{image_files}",
+  "minimum_images_per_species": 50,
+  "recommended_sources": [
+    "iNaturalist (https://www.inaturalist.org/)",
+    "Wikimedia Commons (https://commons.wikimedia.org/)",
+    "Flickr with appropriate licenses",
+    "Your own field photographs",
+    "Wildlife photography databases"
+  ],
+  "image_requirements": {
+    "format": [
+      "JPG",
+      "PNG"
+    ],
+    "min_resolution": "224x224",
+    "quality": "High quality, clear subject",
+    "licensing": "Ensure proper licensing for use"
+  },
+  "species_list": [
+    "Bengal_Tiger",
+    "Indian_Elephant",
+    "Great_Hornbill",
+    "Indian_Rhinoceros",
+    "Asiatic_Lion",
+    "Snow_Leopard",
+    "Sloth_Bear",
+    "Indian_Peafowl",
+    "Clouded_Leopard",
+    "Wild_Water_Buffalo"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "total_images": 600,
+  "train_images": 420,
+  "val_images": 90,
+  "test_images": 90,
+  "num_species": 5,
+  "species_distribution": {
+    "train": {
+      "Bengal_Tiger": 84,
+      "Great_Hornbill": 84,
+      "Indian_Elephant": 84,
+      "Indian_Peafowl": 84,
+      "Indian_Rhinoceros": 84
+    },
+    "val": {
+      "Bengal_Tiger": 18,
+      "Great_Hornbill": 18,
+      "Indian_Elephant": 18,
+      "Indian_Peafowl": 18,
+      "Indian_Rhinoceros": 18
+    },
+    "test": {
+      "Bengal_Tiger": 18,
+      "Great_Hornbill": 18,
+      "Indian_Elephant": 18,
+      "Indian_Peafowl": 18,
+      "Indian_Rhinoceros": 18
+    }
+  }
+}

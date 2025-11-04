@@ -1,0 +1,17 @@
+{
+  "class_to_idx": {
+    "Bengal_Tiger": 0,
+    "Great_Hornbill": 1,
+    "Indian_Elephant": 2,
+    "Indian_Peafowl": 3,
+    "Indian_Rhinoceros": 4
+  },
+  "idx_to_class": {
+    "0": "Bengal_Tiger",
+    "1": "Great_Hornbill",
+    "2": "Indian_Elephant",
+    "3": "Indian_Peafowl",
+    "4": "Indian_Rhinoceros"
+  },
+  "num_classes": 5
+}
